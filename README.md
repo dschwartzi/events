@@ -1,117 +1,330 @@
-# Event-Driven System with EventBridge and Lambda
+```markdown
+# Event Store API Handler
 
-This repository contains the code for an event-driven system built using AWS EventBridge and AWS Lambda. The system allows you to define, store, and manage events, flows, and routing configurations for processing and transforming data in a flexible and scalable manner.
+This Lambda function serves as an API handler for managing events, flows, and elements in a DynamoDB-based event store. It supports CRUD operations via HTTP methods and routes.
 
-## Overview
+### Setup
 
-The event-driven system is designed to simplify the process of building event-driven applications by providing a declarative way to define events, flows, and routing configurations. It leverages AWS EventBridge for event communication and routing, and AWS Lambda for executing the processing logic.
+Ensure you have the following prerequisites:
 
-The system revolves around the concept of events, which represent significant occurrences or data points in your application. Events are defined using a standard event schema that includes a profile object for session-specific details, a data object for media-related information, and an application object for application-specific information.
+- AWS Lambda
+- AWS DynamoDB
+- AWS API Gateway or Lambda URL
 
-## Event Processing Flow
+### Routes
 
-1. Raw data events are sent to the platform via triggers (client SDK, API endpoint, or S3 event listener).
-2. EventBridge routes the events to the appropriate subscribers, such as filters, transformers, views, and apps.
-3. Filters control the event flow by deduplicating, queuing, or dropping events based on thresholds.
-4. Transformers modify the event structure by splitting, combining, or extracting specific elements from events.
-5. Views provide different perspectives or representations of events based on specific criteria.
-6. Apps are end-to-end solutions that utilize filters, transformers, and views to process events for specific use cases.
+The following routes are supported by the handler:
 
-## Extensibility through Filters, Transformers, and Views
+- **GET /events**: Retrieve all events.
+- **GET /flows**: Retrieve all flows.
+- **GET /elements**: Retrieve all elements across all flows.
+- **GET /elements/{flowName}**: Retrieve elements for a specific flow.
+- **GET /event/{eventName}**: Retrieve details of a specific event.
+- **GET /flow/{flowId}**: Retrieve details of a specific flow.
+- **GET /element/{flowName}/{elementId}**: Retrieve details of a specific element within a specific flow.
+- **GET /pre/audio**: Generate a presigned URL for uploading audio files.
+- **GET /pre/video**: Generate a presigned URL for uploading video files.
+- **POST /event**: Create a new event.
+- **POST /flow**: Create a new flow.
+- **POST /element**: Create a new element.
+- **DELETE /flow/{flowId}**: Delete a specific flow.
 
-The platform provides a set of initial filters, transformers, and views that applications can leverage:
+### Request and Response Examples
 
-- Filters:
-  - Counter: Drops events until a specified count or time threshold is reached, then triggers.
-  - Aggregator: Caches event metadata until a threshold is reached, then triggers with aggregated metadata.
-  - Stitcher: Caches event content until a threshold is reached, then stitches content together and triggers.
+#### GET /events
 
-- Transformers:
-  - Splitter: Takes a single event as input and splits it into multiple output events.
-  - Combiner: Caches multiple event types until all are ready, then combines them into a single event.
+**Request:**
 
-- Views:
-  - Summarizer: Uses LLMs to generate a summary representation of the content in an image event.
-  - Transcriber: Converts audio or video event content into a text-based representation using speech recognition.
+```sh
+curl -X GET "https://your-api-endpoint.com/events" \
+     -H "Content-Type: application/json"
+```
 
-The platform also allows for the development of custom filters, transformers, and views to extend its capabilities.
+**Response:**
 
-## Sample Apps
+```json
+[
+    {
+        "eventName": "FiveSecVideoFragEvent",
+        "eventSchema": { ... }
+    },
+    {
+        "eventName": "OneMinFiveSecVideoFragEvent",
+        "eventSchema": { ... }
+    }
+]
+```
 
-The event-driven system enables the development of various applications that can subscribe to events processed by filters, transformers, and views, as well as raw data events. Some sample apps include:
+#### GET /flows
 
-- Timecard: Generates detailed timecards by combining video, audio, and application usage events.
-- Productivity Coach: Provides personalized productivity insights and recommendations based on aggregated event data.
-- Knowledge Base: Automatically captures and organizes knowledge from events into a searchable repository.
+**Request:**
 
-## Data Storage and Querying
+```sh
+curl -X GET "https://your-api-endpoint.com/flows" \
+     -H "Content-Type: application/json"
+```
 
-The platform uses DynamoDB and S3 as the cache for session metadata and object data, respectively. It stores raw data objects, internal data structures, states, questions, responses, etc., in these services. Amazon Q is used to query platform data stored in S3, enabling ad-hoc querying and analysis of data.
+**Response:**
 
-## Event Store Wrapper
+```json
+[
+    {
+        "flowId": "ExampleFlow",
+        "data": { ... }
+    },
+    {
+        "flowId": "AnotherFlow",
+        "data": { ... }
+    }
+]
+```
 
-The Event Store Wrapper is a Lambda function that provides an HTTP interface for interacting with the Event Store. It exposes the following endpoints:
+#### GET /elements
 
-- `GET /events`: Retrieves all registered events.
-- `GET /event/{event-id}`: Retrieves details of a specific event.
-- `GET /flows`: Retrieves all flows.
-- `GET /flow/{flow-id}`: Retrieves details of a specific flow.
-- `POST /flow`: Creates a new flow.
-- `POST /route/{event-id}`: Updates the routing configuration for an event.
-- `DELETE /flow/{flow-id}`: Deletes a specific flow.
+**Request:**
 
-## Creating Event Store Mappings
+```sh
+curl -X GET "https://your-api-endpoint.com/elements" \
+     -H "Content-Type: application/json"
+```
 
-The `create_event_store_mappings.py` script is used to define event schemas and routing configurations and store them in the Event Store. It provides a convenient way to register events and set up their routing logic.
+**Response:**
 
-To create event store mappings, update the `event_schemas` and `routing_configs` dictionaries in the script with your desired event schemas and routing configurations, respectively. Then, run the script to populate the Event Store.
+```json
+[
+    {
+        "elementId": "FiveSecVideoFragCounter",
+        "flowName": "ExampleFlow",
+        "elementDetails": { ... }
+    },
+    {
+        "elementId": "OneMinFiveSecVideoFragExtractor",
+        "flowName": "ExampleFlow",
+        "elementDetails": { ... }
+    }
+]
+```
 
-## API Endpoints
+#### GET /elements/{flowName}
 
-The system exposes the following API endpoints through the Event Store Wrapper Lambda function:
+**Request:**
 
-- `GET /events`
-  - Description: Retrieves all registered events.
-  - Response: Array of event objects.
+```sh
+curl -X GET "https://your-api-endpoint.com/elements/ExampleFlow" \
+     -H "Content-Type: application/json"
+```
 
-- `GET /event/{event-id}`
-  - Description: Retrieves details of a specific event.
-  - Path Parameters:
-    - `event-id`: The unique identifier of the event.
-  - Response: Event object.
+**Response:**
 
-- `GET /flows`
-  - Description: Retrieves all flows.
-  - Response: Array of flow objects.
+```json
+[
+    {
+        "elementId": "FiveSecVideoFragCounter",
+        "elementDetails": { ... }
+    },
+    {
+        "elementId": "OneMinFiveSecVideoFragExtractor",
+        "elementDetails": { ... }
+    }
+]
+```
 
-- `GET /flow/{flow-id}`
-  - Description: Retrieves details of a specific flow.
-  - Path Parameters:
-    - `flow-id`: The unique identifier of the flow.
-  - Response: Flow object.
+#### GET /event/{eventName}
 
-- `POST /flow`
-  - Description: Creates a new flow.
-  - Request Body: Flow data object.
-  - Response: Object containing the created flow ID.
+**Request:**
 
-- `POST /route/{event-id}`
-  - Description: Updates the routing configuration for an event.
-  - Path Parameters:
-    - `event-id`: The unique identifier of the event.
-  - Request Body: Routing configuration object.
-  - Response: Success message.
+```sh
+curl -X GET "https://your-api-endpoint.com/event/FiveSecVideoFragEvent" \
+     -H "Content-Type: application/json"
+```
 
-- `DELETE /flow/{flow-id}`
-  - Description: Deletes a specific flow.
-  - Path Parameters:
-    - `flow-id`: The unique identifier of the flow.
-  - Response: Success message.
+**Response:**
 
-## Contributing
+```json
+{
+    "eventName": "FiveSecVideoFragEvent",
+    "eventSchema": { ... }
+}
+```
 
-Contributions to the event-driven system are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+#### GET /flow/{flowId}
 
-## License
+**Request:**
 
-This project is licensed under the [MIT License](LICENSE).
+```sh
+curl -X GET "https://your-api-endpoint.com/flow/ExampleFlow" \
+     -H "Content-Type: application/json"
+```
+
+**Response:**
+
+```json
+{
+    "nodes": [
+        {
+            "id": "Get Eventbridge-1716717420333",
+            "label": "Get Eventbridge"
+        },
+        {
+            "id": "Get Eventbridge-1716717423334",
+            "label": "Get Eventbridge"
+        },
+        {
+            "id": "OpenAI-1716717747543",
+            "label": "OpenAI"
+        }
+    ],
+    "edges": [
+        {
+            "id": "reactflow__edge-Get Eventbridge-1716717423334
+
+-OpenAI-1716717747543",
+            "source": "Get Eventbridge-1716717423334",
+            "target": "OpenAI-1716717747543"
+        }
+    ]
+}
+```
+
+#### GET /element/{flowName}/{elementId}
+
+**Request:**
+
+```sh
+curl -X GET "https://your-api-endpoint.com/element/ExampleFlow/FiveSecVideoFragCounter" \
+     -H "Content-Type: application/json"
+```
+
+**Response:**
+
+```json
+{
+    "elementId": "FiveSecVideoFragCounter",
+    "elementDetails": { ... }
+}
+```
+
+#### GET /pre/audio
+
+**Request:**
+
+```sh
+curl -X GET "https://your-api-endpoint.com/pre/audio" \
+     -H "Content-Type: application/json"
+```
+
+**Response:**
+
+```json
+{
+    "presignedUrl": "https://your-s3-bucket-url.com/audio/20230101010101.mp3?AWSAccessKeyId=..."
+}
+```
+
+#### GET /pre/video
+
+**Request:**
+
+```sh
+curl -X GET "https://your-api-endpoint.com/pre/video" \
+     -H "Content-Type: application/json"
+```
+
+**Response:**
+
+```json
+{
+    "presignedUrl": "https://your-s3-bucket-url.com/video/20230101010101.mp4?AWSAccessKeyId=..."
+}
+```
+
+#### POST /event
+
+**Request:**
+
+```sh
+curl -X POST "https://your-api-endpoint.com/event" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "eventName": "NewEvent",
+           "eventSchema": { ... }
+         }'
+```
+
+**Response:**
+
+```json
+{
+    "statusCode": 201,
+    "body": "Event created"
+}
+```
+
+#### POST /flow
+
+**Request:**
+
+```sh
+curl -X POST "https://your-api-endpoint.com/flow" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "flowName": "NewFlow",
+           "data": { ... }
+         }'
+```
+
+**Response:**
+
+```json
+{
+    "statusCode": 201,
+    "body": { "flowId": "new-flow-id" }
+}
+```
+
+#### POST /element
+
+**Request:**
+
+```sh
+curl -X POST "https://your-api-endpoint.com/element" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "flowName": "ExampleFlow",
+           "elementId": "NewElement",
+           "elementDetails": { ... }
+         }'
+```
+
+**Response:**
+
+```json
+{
+    "statusCode": 201,
+    "body": "Element created"
+}
+```
+
+#### DELETE /flow/{flowId}
+
+**Request:**
+
+```sh
+curl -X DELETE "https://your-api-endpoint.com/flow/ExampleFlow" \
+     -H "Content-Type: application/json"
+```
+
+**Response:**
+
+```json
+{
+    "statusCode": 200,
+    "body": "Flow deleted"
+}
+```
+
+### Notes
+
+- Ensure to replace `https://your-api-endpoint.com` with your actual API endpoint.
+- Adjust CORS headers as per your domain requirements.
+```
