@@ -21,8 +21,6 @@ The following routes are supported by the handler:
 - **GET /event/{eventName}**: Retrieve details of a specific event.
 - **GET /flow/{flowId}**: Retrieve details of a specific flow.
 - **GET /element/{flowName}/{elementId}**: Retrieve details of a specific element within a specific flow.
-- **GET /pre/audio**: Generate a presigned URL for uploading audio files.
-- **GET /pre/video**: Generate a presigned URL for uploading video files.
 - **POST /event**: Create a new event.
 - **POST /flow**: Create a new flow.
 - **POST /element**: Create a new element.
@@ -198,40 +196,6 @@ curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aw
 {
     "elementId": "FiveSecVideoFragCounter",
     "elementDetails": { ... }
-}
-```
-
-#### GET /pre/audio
-
-**Request:**
-
-```sh
-curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/pre/audio" \
-     -H "Content-Type: application/json"
-```
-
-**Response:**
-
-```json
-{
-    "presignedUrl": "https://your-s3-bucket-url.com/audio/20230101010101.mp3?AWSAccessKeyId=..."
-}
-```
-
-#### GET /pre/video
-
-**Request:**
-
-```sh
-curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/pre/video" \
-     -H "Content-Type: application/json"
-```
-
-**Response:**
-
-```json
-{
-    "presignedUrl": "https://your-s3-bucket-url.com/video/20230101010101.mp4?AWSAccessKeyId=..."
 }
 ```
 
