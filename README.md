@@ -1,75 +1,52 @@
 # Event-Driven System with EventBridge and Lambda
 
-This repository contains the code for an event-driven system built using AWS EventBridge and AWS Lambda. The system allows you to define, store, and manage events, flows, and routing configurations for processing and transforming data.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Getting Started](#getting-started)
-- [Event Store](#event-store)
-- [Event Store Wrapper](#event-store-wrapper)
-- [Creating Event Store Mappings](#creating-event-store-mappings)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+This repository contains the code for an event-driven system built using AWS EventBridge and AWS Lambda. The system allows you to define, store, and manage events, flows, and routing configurations for processing and transforming data in a flexible and scalable manner.
 
 ## Overview
 
-The event-driven system provides a scalable and flexible way to process and transform data based on predefined events, flows, and routing configurations. It leverages AWS EventBridge for event management and AWS Lambda for executing the processing logic.
+The event-driven system is designed to simplify the process of building event-driven applications by providing a declarative way to define events, flows, and routing configurations. It leverages AWS EventBridge for event communication and routing, and AWS Lambda for executing the processing logic.
 
-## Architecture
+The system revolves around the concept of events, which represent significant occurrences or data points in your application. Events are defined using a standard event schema that includes a profile object for session-specific details, a data object for media-related information, and an application object for application-specific information.
 
-The system architecture consists of the following components:
+## Event Processing Flow
 
-- **Event Store**: A DynamoDB table that stores event schemas, flows, and routing configurations.
-- **Event Store Wrapper**: A Lambda function that provides an HTTP interface for interacting with the Event Store.
-- **Router**: A Lambda function that receives events from EventBridge and routes them to the appropriate processing logic based on the routing configurations.
-- **Processing Functions**: Lambda functions that perform specific data processing tasks based on the received events.
+1. Raw data events are sent to the platform via triggers (client SDK, API endpoint, or S3 event listener).
+2. EventBridge routes the events to the appropriate subscribers, such as filters, transformers, views, and apps.
+3. Filters control the event flow by deduplicating, queuing, or dropping events based on thresholds.
+4. Transformers modify the event structure by splitting, combining, or extracting specific elements from events.
+5. Views provide different perspectives or representations of events based on specific criteria.
+6. Apps are end-to-end solutions that utilize filters, transformers, and views to process events for specific use cases.
 
-## Getting Started
+## Extensibility through Filters, Transformers, and Views
 
-To get started with the event-driven system, follow these steps:
+The platform provides a set of initial filters, transformers, and views that applications can leverage:
 
-1. Clone the repository:
+- Filters:
+  - Counter: Drops events until a specified count or time threshold is reached, then triggers.
+  - Aggregator: Caches event metadata until a threshold is reached, then triggers with aggregated metadata.
+  - Stitcher: Caches event content until a threshold is reached, then stitches content together and triggers.
 
-   ```
-   git clone https://github.com/your-username/event-driven-system.git
-   ```
+- Transformers:
+  - Splitter: Takes a single event as input and splits it into multiple output events.
+  - Combiner: Caches multiple event types until all are ready, then combines them into a single event.
 
-2. Set up the required AWS resources:
-   - Create a DynamoDB table for the Event Store.
-   - Create an EventBridge event bus.
-   - Set up the necessary IAM permissions for the Lambda functions.
+- Views:
+  - Summarizer: Uses LLMs to generate a summary representation of the content in an image event.
+  - Transcriber: Converts audio or video event content into a text-based representation using speech recognition.
 
-3. Configure the environment variables in the `template.yaml` file:
-   - Set the `EVENT_STORE_TABLE_NAME` to the name of your DynamoDB table.
-   - Set the `EVENT_BUS_ARN` to the ARN of your EventBridge event bus.
+The platform also allows for the development of custom filters, transformers, and views to extend its capabilities.
 
-4. Deploy the system using AWS SAM:
+## Sample Apps
 
-   ```
-   sam build
-   sam deploy --guided
-   ```
+The event-driven system enables the development of various applications that can subscribe to events processed by filters, transformers, and views, as well as raw data events. Some sample apps include:
 
-5. Create event store mappings by running the `create_event_store_mappings.py` script:
+- Timecard: Generates detailed timecards by combining video, audio, and application usage events.
+- Productivity Coach: Provides personalized productivity insights and recommendations based on aggregated event data.
+- Knowledge Base: Automatically captures and organizes knowledge from events into a searchable repository.
 
-   ```
-   python create_event_store_mappings.py
-   ```
+## Data Storage and Querying
 
-6. Start sending events to the system and observe the processing results.
-
-## Event Store
-
-The Event Store is a DynamoDB table that stores event schemas, flows, and routing configurations. It uses the following structure:
-
-- **PK** (Partition Key): Indicates the type of item stored (`events`, `flow`).
-- **SK** (Sort Key): Represents the unique identifier of the item (event name, flow ID).
-- **Schema**: Contains the JSON schema of the event.
-- **RoutingConfig**: Contains the routing configuration for the event.
-- **Data**: Contains the flow data.
+The platform uses DynamoDB and S3 as the cache for session metadata and object data, respectively. It stores raw data objects, internal data structures, states, questions, responses, etc., in these services. Amazon Q is used to query platform data stored in S3, enabling ad-hoc querying and analysis of data.
 
 ## Event Store Wrapper
 
