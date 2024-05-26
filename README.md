@@ -1,4 +1,3 @@
-```markdown
 # Event Store API Handler
 
 This Lambda function serves as an API handler for managing events, flows, and elements in a DynamoDB-based event store. It supports CRUD operations via HTTP methods and routes.
@@ -36,7 +35,7 @@ The following routes are supported by the handler:
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/events" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/events" \
      -H "Content-Type: application/json"
 ```
 
@@ -60,7 +59,7 @@ curl -X GET "https://your-api-endpoint.com/events" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/flows" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/flows" \
      -H "Content-Type: application/json"
 ```
 
@@ -84,7 +83,7 @@ curl -X GET "https://your-api-endpoint.com/flows" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/elements" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/elements" \
      -H "Content-Type: application/json"
 ```
 
@@ -110,7 +109,7 @@ curl -X GET "https://your-api-endpoint.com/elements" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/elements/ExampleFlow" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/elements/ExampleFlow" \
      -H "Content-Type: application/json"
 ```
 
@@ -134,7 +133,7 @@ curl -X GET "https://your-api-endpoint.com/elements/ExampleFlow" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/event/FiveSecVideoFragEvent" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/event/FiveSecVideoFragEvent" \
      -H "Content-Type: application/json"
 ```
 
@@ -152,7 +151,7 @@ curl -X GET "https://your-api-endpoint.com/event/FiveSecVideoFragEvent" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/flow/ExampleFlow" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/flow/ExampleFlow" \
      -H "Content-Type: application/json"
 ```
 
@@ -176,9 +175,7 @@ curl -X GET "https://your-api-endpoint.com/flow/ExampleFlow" \
     ],
     "edges": [
         {
-            "id": "reactflow__edge-Get Eventbridge-1716717423334
-
--OpenAI-1716717747543",
+            "id": "reactflow__edge-Get Eventbridge-1716717423334-OpenAI-1716717747543",
             "source": "Get Eventbridge-1716717423334",
             "target": "OpenAI-1716717747543"
         }
@@ -191,7 +188,7 @@ curl -X GET "https://your-api-endpoint.com/flow/ExampleFlow" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/element/ExampleFlow/FiveSecVideoFragCounter" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/element/ExampleFlow/FiveSecVideoFragCounter" \
      -H "Content-Type: application/json"
 ```
 
@@ -209,7 +206,7 @@ curl -X GET "https://your-api-endpoint.com/element/ExampleFlow/FiveSecVideoFragC
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/pre/audio" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/pre/audio" \
      -H "Content-Type: application/json"
 ```
 
@@ -226,7 +223,7 @@ curl -X GET "https://your-api-endpoint.com/pre/audio" \
 **Request:**
 
 ```sh
-curl -X GET "https://your-api-endpoint.com/pre/video" \
+curl -X GET "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/pre/video" \
      -H "Content-Type: application/json"
 ```
 
@@ -243,7 +240,7 @@ curl -X GET "https://your-api-endpoint.com/pre/video" \
 **Request:**
 
 ```sh
-curl -X POST "https://your-api-endpoint.com/event" \
+curl -X POST "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/event" \
      -H "Content-Type: application/json" \
      -d '{
            "eventName": "NewEvent",
@@ -265,7 +262,7 @@ curl -X POST "https://your-api-endpoint.com/event" \
 **Request:**
 
 ```sh
-curl -X POST "https://your-api-endpoint.com/flow" \
+curl -X POST "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/flow" \
      -H "Content-Type: application/json" \
      -d '{
            "flowName": "NewFlow",
@@ -287,7 +284,7 @@ curl -X POST "https://your-api-endpoint.com/flow" \
 **Request:**
 
 ```sh
-curl -X POST "https://your-api-endpoint.com/element" \
+curl -X POST "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/element" \
      -H "Content-Type: application/json" \
      -d '{
            "flowName": "ExampleFlow",
@@ -310,7 +307,7 @@ curl -X POST "https://your-api-endpoint.com/element" \
 **Request:**
 
 ```sh
-curl -X DELETE "https://your-api-endpoint.com/flow/ExampleFlow" \
+curl -X DELETE "https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws/flow/ExampleFlow" \
      -H "Content-Type: application/json"
 ```
 
@@ -325,6 +322,6 @@ curl -X DELETE "https://your-api-endpoint.com/flow/ExampleFlow" \
 
 ### Notes
 
-- Ensure to replace `https://your-api-endpoint.com` with your actual API endpoint.
+- Ensure to replace `https://fnm5fxxy2vahrcele6g3akqn5y0spper.lambda-url.us-east-1.on.aws` with your actual API endpoint.
 - Adjust CORS headers as per your domain requirements.
 ```
